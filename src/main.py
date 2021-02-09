@@ -32,7 +32,7 @@ async def on_message(message):
     if message.author == client.user:
         return
 
-    if message.content.startswith(PREFIX):
+    if message.content.startswith(PREFIX):  # !growths fe6-roy --> ['fe6', 'roy']
         args = message.content[len(PREFIX) + 1 : ].split('-')
         print(args)
         await message.channel.send(f'You sent: **{message.content}**')
