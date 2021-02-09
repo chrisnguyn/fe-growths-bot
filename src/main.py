@@ -1,25 +1,18 @@
 """
-todo:
-    -scraper
-    -make a command that shows game mapping (ie. which feX is fates?)
-
-fe6 - Binding Blade
-fe7 - Blazing Sword
-fe8 - Sacred Stones
-
-sample input:
-!growths fe6-roy
-!growths fe7-lucius
+https://discordpy.readthedocs.io/en/latest/quickstart.html
+https://www.youtube.com/watch?v=SPTfmiYiuok&ab_channel=freeCodeCamp.org
 """
 
 import discord
 import os
 from dotenv import load_dotenv
+from scraper import *
 
 
 client = discord.Client()
 load_dotenv()
-PREFIX = '!growths'
+GROWTHS = '!growths'
+GAMES = '!games'
 
 
 @client.event
@@ -32,10 +25,12 @@ async def on_message(message):
     if message.author == client.user:
         return
 
-    if message.content.startswith(PREFIX):  # !growths fe6-roy --> ['fe6', 'roy']
-        args = message.content[len(PREFIX) + 1 : ].split('-')
-        print(args)
-        await message.channel.send(f'You sent: **{message.content}**')
+    if message.content.startswith(GROWTHS):  # !growths fe6-roy --> ['fe6', 'roy']
+        args = message.content[len(GROWTHS) + 1 : ].split('-')
+        await message.channel.send(embed=get_stats(args))
+
+    if message.content.startswith(GAMES):
+        await message.channel.send(embed=create_embed())
 
 
 client.run(os.getenv('TOKEN'))

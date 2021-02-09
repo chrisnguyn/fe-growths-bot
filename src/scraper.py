@@ -1,111 +1,59 @@
+"""
+https://www.youtube.com/watch?v=87Gx3U0BDlo&ab_channel=freeCodeCamp.org
+
+FYI: columns for the GBA games != 3H columns
+"""
+
+import discord
 import requests
 from bs4 import BeautifulSoup
 
-response = requests.get('https://serenesforest.net/the-sacred-stones/characters/growth-rates/')  # FE8
 
-# print(response.status_code)
-# print(response.headers)
-page_content = response.content
-
-soup = BeautifulSoup(page_content, features='html.parser')  # clean raw content
-
-# print(soup)
-
-"""
-links = soup.find_all('a')
-print(links)
-"""
-
-# characters = soup.find_all('td')
-# print(characters)
-
-# for x in characters:
-    # print(x)
-    # print('')
-    # print('')
-
-# print(characters[0])
-
-"""
-<tr>
-    <td> ...
-    stats
-</tr>
-"""
-
-# characters = soup.find_all('tr')
-# print(characters)
-
-# for char in characters:
-    # print(char)
-    # print('')
-
-# print(characters[1])
-
-# character = soup.find('Eirika')
-# print(character)
-
-"""
-characters = soup.find_all('tr')
-
-for character in characters:
-    if 'Eirika' in character.text
-        print(character)
-"""
-
-# characters = soup.find_all('tr')
-
-# for character in characters:
-    # if 'Eirika' in character.text
-        # print(character)
-
-# for c in characters:
-    # print(c.text)
+GAME_LINKS = {
+    'fe6': 'https://serenesforest.net/binding-blade/characters/growth-rates/',
+    'fe7': 'https://serenesforest.net/blazing-sword/characters/growth-rates/',
+    'fe8': 'https://serenesforest.net/the-sacred-stones/characters/growth-rates/',
+}
 
 
-"""
-Print Eirika stats.
-"""
+def get_stats(context):
+    url = GAME_LINKS[context[0]]
+    response = requests.get(url)
+    content = response.content
+    soup = BeautifulSoup(content, features='html.parser')
+    characters = soup.find_all('tr')
 
-# characters = soup.find_all('tr')  # get all characters
+    for character in characters:
+        data = character.text.split('\n')
 
-# print(type(characters))  result set
+        if data[1].lower() == context[1].lower():
+            return get_growths(data)
 
-# for character in characters:
-    # print(type(character)) tag
-    # print(character)
-    # print(type(character.text))
-    # print(character.text)
-
-
-# chars = soup.find_all('tr')
-
-# for char in chars:
-#     # print(char.text)
-
-#     data = char.text.split('\n')
-#     print(data)
+    return discord.Embed(title='NO RESULTS FOUND')
 
 
-def getGrowths(content):
-    stats = [
-        f'HP: {content[2]}',
-        f'Str / Mag: {content[3]}',
-        f'Skill: {content[4]}',
-        f'Speed: {content[5]}',
-        f'Luck: {content[6]}',
-        f'Defense: {content[7]}',
-        f'Resistance: {content[8]}'
-    ]
+def get_growths(context):
+    embed_var = discord.Embed(title='Character Stats', color=0x0076B6)
+    embed_var.add_field(name='Health', value=f'{context[2]}', inline=False)
+    embed_var.add_field(name='Strength / Magic', value=f'{context[3]}', inline=False)
+    embed_var.add_field(name='Skill', value=f'{context[4]}', inline=False)
+    embed_var.add_field(name='Speed', value=f'{context[5]}', inline=False)
+    embed_var.add_field(name='Luck', value=f'{context[6]}', inline=False)
+    embed_var.add_field(name='Defense', value=f'{context[7]}', inline=False)
+    embed_var.add_field(name='Resistance', value=f'{context[8]}', inline=False)
 
-    print(stats)
-
+    return embed_var
 
 
-characters = soup.find_all('tr')
+def create_embed():
+    embed_var = discord.Embed(title='Fire Emblem Series', color=0x0076B6)
+    embed_var.add_field(name='fe6', value='Binding Blade', inline=False)
+    embed_var.add_field(name='fe7', value='Blazing Blade', inline=False)
+    embed_var.add_field(name='fe8', value='Sacred Stones', inline=False)
+    embed_var.add_field(name='fe11', value='Awakening', inline=False)
+    embed_var.add_field(name='fe12-birthright', value='Fates', inline=False)
+    embed_var.add_field(name='fe12-conquest', value='Fates', inline=False)
+    embed_var.add_field(name='fe12-revelations', value='Fates', inline=False)
+    embed_var.add_field(name='fe13', value='Three Houses', inline=False)
 
-for character in characters:
-    data = character.text.split('\n')  # ['', 'Eirika', '70', '40', '60', '60', '60', '30', '30', '']
-
-    if data[1] == 'Eirika':
-        growths = getGrowths(data)
+    return embed_var
